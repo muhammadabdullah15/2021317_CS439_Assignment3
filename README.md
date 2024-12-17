@@ -31,21 +31,66 @@ RDDs were not used for this dataset since the dataset is already structured in *
 sudo docker pull bitnami/spark:latest 
 
 // Build docker image:
-sudo docker build -t netflix-spark-analysis .
+sudo docker build -t spark-custom .
 
-
+// Start the Spark master and workers
+sudo docker compose up -d
 
 // Run docker image:
-sudo docker run --name spark-container netflix-spark-analysis 
+sudo docker exec -it spark-master spark-submit /opt/spark-data/netflix_eda.py
 
-// Copy over analysis results to local:
-sudo docker cp spark-container:/opt/spark-data/results ./results 
+// Shutdown spark
+sudo docker compose down
 ```
 
 ## Output
 #### 1. Dataset Sample
+|title|type|country|release_year|listed_in|duration|
+|:-----------:|:-----------:|:-----------:|:-----------:|:-----------:|:-----------:|
+|Dick Johnson Is Dead|Movie|United States|2020|Documentaries|90 min|
+|Blood & Water|TV Show|South Africa|2021|International TV Shows, TV Dramas, TV Mysteries|2 Seasons|
+|Ganglands|TV Show|N/A||2021|Crime TV Shows, International TV Shows, TV Action & Adventure|1 Season|
+|Jailbirds New Orleans|TV Show|N/A|2021|Docuseries, Reality TV|1 Season|
+|Kota Factory|TV Show|India|2021|International TV Shows, Romantic TV Shows, TV Comedies|2 Seasons|
+|Midnight Mass|TV Show|N/A||2021|TV Dramas, TV Horror, TV Mysteries|1 Season|
+|My Little Pony: A New Generation|Movie|N/A||2021|Children & Family Movies|91 min|
+|Sankofa|Movie|United States, Ghana, Burkina Faso, United Kingdom, Germany, Ethiopia|1993|Dramas, Independent Movies, International Movies|125 min|
+|The Great British Baking Show|TV Show|United Kingdom|2021|British TV Shows, Reality TV|9 Seasons|
+|The Starling|Movie|United States|2021|Comedies, Dramas|104 min|
+
 #### 2. Schema
+```bash
+StructType(
+  [StructField('show_id', StringType(), True),
+   StructField('type', StringType(), True),
+   StructField('title', StringType(), True), 
+   StructField('director', StringType(), True), 
+   StructField('cast', StringType(), True), 
+   StructField('country', StringType(), True), 
+   StructField('date_added', StringType(), True), 
+   StructField('release_year', StringType(), True), 
+   StructField('rating', StringType(), True), 
+   StructField('duration', StringType(), True), 
+   StructField('listed_in', StringType(), True), 
+   StructField('description', StringType(), True)]
+  )
+  ```
 #### 3. Null Counts
+|Column|Number of null values|
+|:-----------:|:-----------:|
+|show_id|0|
+|type|   1|
+|title|  2|
+|director|   2636|
+|cast|   826|
+|country|832|
+|date_added| 13|
+|release_year|   2|
+|rating| 6|
+|duration|   5|
+|listed_in|  3|
+|description|3|
+
 #### 4. Type Count
 ![Type Count](/results/type_count.png)
 #### 5. Titles Per Year
